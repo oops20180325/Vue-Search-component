@@ -1,14 +1,14 @@
 <template>
-    <div class="dms_search">
+    <div class="dms_search" ref="dms_search">
         <h5>
             后台传入的应该是一个关于搜索的对象类似 [{类型：文本，叫什么名字：联系人，规则：包含}，......（多个）]
         </h5>
         <!-- 一个小单元   for循环便利出来-->
-        <div v-for="(item,index) in searchGroup" :key="index">
+        <div v-for="(item,index) in searchGroup" :key="index" class="search_item">
              <!-- if 文本 -->
             <!-- <div v-if="item.type==='text'">    这样写不报错v-if不能直接定义到item -->
-            <div v-if="searchGroup[index].type==='text'">
-                <p>
+            <div v-if="searchGroup[index].type==='text'" >
+                <p class="searchTop">
                     <span>{{item.title}}</span>
                     <span>{{item.selected}}</span>
                     <select name="" id="" v-model="item['selected']" @change="conditionChange(item.selected,index)">
@@ -21,7 +21,7 @@
                         <option value="start">开头是</option>
                         <option value="end">结尾是</option>
                     </select>
-                    <button @click="removeSearchOption(index)">移除搜索单元</button>
+                    <button @click="removeSearchOption(index)">X</button>
                 </p>
                 <div>
                     <div v-for="(ls,ide) in item.list" :key="ide">
@@ -35,7 +35,7 @@
             </div>
             <!-- if 枚举 -->
             <div v-if="searchGroup[index].type==='selectes'">
-                <p>
+                <p class="searchTop">
                     <span>{{item.title}}</span>
                     <select name="" id="" v-model="item['selected']" @change="conditionChange(item.selected,index)">
                         <option value="" disabled>请选择</option>
@@ -43,16 +43,14 @@
                         <option value="not">不是</option>
                         <option value="oneOf">之一</option>
                     </select>
-                    <button @click="removeSearchOption(index)" >移除搜索单元</button>
+                    <button @click="removeSearchOption(index)" >X</button>
                 </p>
                 <div>
                     <div v-for="(ls,ide) in item.list" :key="ide">
-                        <select name="" id="" v-model="ls.selected">
-                            <option value="0">请选择</option>
-                            <option value="1">请</option>
-                            <option value="2">333</option>
+                        <select name="" id="" v-model="ls.selected" >
+                            <option value="" disabled >请选择</option>
                             <!-- v-for遍历 -->
-                            <!-- <option value="" v-for=""></option> -->
+                            <option :value="op.key" v-for="op in item.options" :key="op.key" >{{op.title}}</option>
                         </select>
                         <button @click="deleOneOf(index,ide)" v-show="item.list.length>1">×</button>
                     </div>
@@ -63,10 +61,10 @@
             </div>
             <!-- if 数字 -->
             <div v-if="searchGroup[index].type==='numbers'">
-                 <p>
+                 <p class="searchTop">
                     <span>{{item.title}}</span>
                     <span>{{item.selected}}</span>
-                    <select name="" id="" v-model="item['selected']" @change="conditionChange(item.selected,index)">
+                    <select name="" id="" v-model="item['selected']"  @change="conditionChange(item.selected,index)">
                         <option value="" disabled>请选择</option>
                         <option value="equal">等于</option>
                         <option value="lt">小于</option>
@@ -76,7 +74,7 @@
                         <option value="between">介于</option>
                         <option value="oneOf">之一</option>
                     </select>
-                    <button @click="removeSearchOption(index)">移除搜索单元</button>
+                    <button @click="removeSearchOption(index)">X</button>
                 </p>
                 <div>
                     <div v-for="(ls,ide) in item.list" :key="ide">
@@ -96,7 +94,7 @@
             </div>
             <!-- if 日期 -->
             <div v-if="searchGroup[index].type==='dates'">
-                <div>
+                <div class="searchTop">
                     <span>{{item.title}}</span>
                     <select name="" id="" v-model="item.selected" @change="conditionChange(item.selected,index)">
                         <option value="" disabled>请选择</option>
@@ -108,7 +106,7 @@
                         <option value="between">介于</option>
                         <option value="oneOf">之一</option>
                     </select>
-                    <button @click="removeSearchOption(index)">移除搜索单元</button>
+                    <button @click="removeSearchOption(index)">X</button>
                 </div>
                 <div>
                     <div v-for="(ls,ide) in item.list" :key="ide">
@@ -124,6 +122,7 @@
                                 start-placeholder="开始日期"
                                 end-placeholder="结束日期">
                                 </el-date-picker>
+                                <button @click="deleOneOf(index,ide)" v-show="item.list.length>1">×</button>
                             </div>
                             <!-- <div v-if="item.selected !='between'"> -->
                             <div v-show="!showDateRange">
@@ -135,9 +134,10 @@
                                 value-format="yyyy-MM-dd"
                                 placeholder="选择日期">
                                 </el-date-picker>
+                                <button @click="deleOneOf(index,ide)" v-show="item.list.length>1">×</button>
                             </div>
                         </div>
-                         <button @click="deleOneOf(index,ide)" v-show="item.list.length>1">×</button>
+
                     </div>
 
                     <!-- 之一的话需要添加 -->
@@ -146,10 +146,10 @@
             </div>
             <!-- if 车系车型车款  四级联动-->
             <div v-if="searchGroup[index].type === 'carAbout'">
-                <div>
+                <div class="searchTop">
                     <span>{{item.title}}</span>
                     <select name="" id="" v-model="item['selected']" @change="conditionChange(item.selected,index)">
-                        <option value="">请选择</option>
+                        <option value="" disabled>请选择</option>
                         <option value="include">包含</option>
                         <option value="just">正好是</option>
                         <option value="except">不包含</option>
@@ -158,7 +158,7 @@
                         <option value="start">开头是</option>
                         <option value="end">结尾是</option>
                     </select>
-                    <button @click="removeSearchOption(index)">移除搜索单元</button>
+                    <button @click="removeSearchOption(index)">X</button>
                 </div>
                 <div>
                     <div>
@@ -199,9 +199,9 @@
             </div>
             <!-- 地址 四级联动 -->
             <div v-if="searchGroup[index].type === 'address'">
-                <div>
+                <div class="searchTop">
                     <span>{{item.title}}</span>
-                    <button @click="removeSearchOption(index)">移除搜索单元</button>
+                    <button @click="removeSearchOption(index)">X</button>
                 </div>
                 <div>
 
@@ -229,9 +229,16 @@
 
        <!-- footer -->
        <div class="search_footer">
-           <button>+添加筛选字段</button> &nbsp; <button @click="saveSearchGroup">保存</button>
+           <button @click="addCell">+添加筛选字段</button> &nbsp; <button @click="saveSearchGroup">保存</button>
+            <br>
+           <select name="" id="" v-if="addCellshow" @change="addCellChange(addCellSelect)" v-model="addCellSelect" onclick="event.stopPropagation();">
+               <option value="" disabled>请选择筛选字段</option>
+               <!-- 把索引传给 select 绑定的v-molde里 -->
+               <option :value="index" v-for="(item,index) in addCellGroup" :key="index" :disabled="item.inSearchGroup">{{item.title}}</option>
+
+           </select>
            <br>
-           <button>重置</button> &nbsp; <button @click="searchMessage">查询</button>
+           <button class="footer_btn" @click="searchResetting">重置</button> &nbsp; <button @click="searchMessage" class="footer_btn">查询</button>
        </div>
     </div>
 </template>
@@ -240,7 +247,19 @@
         name:'dmsSearch',
         data(){
             return {
-                showDateRange:true, //修改element样式bug
+                addCellSelect:'', // 储存添加此段selected 对应addCellGroup选中项的索引
+                addCellGroup:[ // 储存添加字段列表
+                    {title:'姓名',type:'text',list:[{}],selected:'',inSearchGroup:false},
+                    {title:'出货日期',type:'dates',list:[{}],selected:"",inSearchGroup:false}, // list 数组里至少有ge空对象
+                    {title:'工单号',type:'text',list:[{}],selected:'',inSearchGroup:true },
+                    {title:'送修人',type:'selectes',list:[{selected:''}],selected:'',options:[{key:1,title:'张三'},{key:2,title:'李四'},{key:3,title:'王五'},{key:4,title:'赵六'}],inSearchGroup:true},
+                    {title:'金额',type:'numbers',list:[{}],selected:'',inSearchGroup:true},
+                    {title:'购买日期',type:'dates',list:[{}],selected:"equal",inSearchGroup:true}, // list 数组里至少有ge空对象
+                    {title:'车型车款',type:'carAbout',list:[{brandID:'',seriesID:'',modelID:'',styleID:''}],inSearchGroup:true},
+                    {title:'联系地址',type:'address',list:{pro:'',city:'',area:'',address:''},inSearchGroup:true},  // 省 暂时不用列表 后面可能会改回来
+                ],
+                addCellshow:false, // 添加筛选字段显示与否
+                showDateRange:false, //修改element样式bug
                 carBrand:[], // 汽车品牌列表
                 carSeries:[], // 车系列表
                 carModel:[], // 车型列表
@@ -249,12 +268,12 @@
                 cityData:[], // 城市信息列表
                 areaData:[], // 区县信息列表
                 searchGroup:[ //储存搜索列表
-                    // { title:'工单号',type:'text',list:[{}],selected:''},
-                    // {title:'送修人',type:'selectes',list:[{}],selected:''},
-                    // {title:'金额',type:'numbers',list:[{}],selected:''},
+                    { title:'工单号',type:'text',list:[{}],selected:''},
+                    {title:'送修人',type:'selectes',list:[{selected:''}],selected:'',options:[{key:1,title:'张三'},{key:2,title:'李四'},{key:3,title:'王五'},{key:4,title:'赵六'}]},
+                    {title:'金额',type:'numbers',list:[{}],selected:''},
                     {title:'购买日期',type:'dates',list:[{}],selected:"equal"}, // list 数组里至少有ge空对象
-                    // {title:'车型车款',type:'carAbout',list:[{brandID:'',seriesID:'',modelID:'',styleID:''}]},
-                    // {title:'联系地址',type:'address',list:{pro:'',city:'',area:'',address:''}},  // 省 暂时不用列表 后面可能会改回来
+                    {title:'车型车款',type:'carAbout',list:[{brandID:'',seriesID:'',modelID:'',styleID:''}]},
+                    {title:'联系地址',type:'address',list:{pro:'',city:'',area:'',address:''}},  // 省 暂时不用列表 后面可能会改回来
                 ],
                 // searchlist:[
                 //     {
@@ -270,6 +289,20 @@
             }
         },
         methods:{
+            // 添加单元
+            addCell(){
+                event.stopPropagation();
+                this.addCellshow = true
+                this.addCellSelect = '';
+            },
+            // 添加单元select选中
+            addCellChange(addCellSelectIndex){
+                console.log('addCellChange',addCellSelectIndex);
+                // do something;
+                this.searchGroup.push(this.addCellGroup[addCellSelectIndex]);
+                this.addCellGroup[addCellSelectIndex].inSearchGroup = true;
+                this.addCellshow = false;
+            },
             // 按条件查询
             searchMessage(){
                 console.log('查询条件',this.searchGroup)
@@ -359,6 +392,9 @@
                 if(this.searchGroup[index].type==='carAbout'){
                     console.log('add careAbout');
                     this.searchGroup[index].list.push({brandID:'',seriesID:'',modelID:'',styleID:''});
+                }else if(this.searchGroup[index].type==='selectes' ){
+                        console.log('add selectes');
+                        this.searchGroup[index].list.push({selected:''});
                 }else{
                     this.searchGroup[index].list.push({});
                 }
@@ -366,8 +402,16 @@
             },
             // 移除搜索项乘员
             removeSearchOption(index){
+                // 修改addCellGroup
+                let flag =  this.searchGroup[index].title;  // title 在这里做唯一标识
+                let deleIndex = this.addCellGroup.findIndex((value,index,arr) =>{
+                    return value.title ===flag;
+                })
+                console.log('编辑addCellGroup里的索引',deleIndex)
+                this.addCellGroup[deleIndex].inSearchGroup = false;
+                // 修改searchGroup
                 this.searchGroup.splice(index,1)
-                console.log('移除第',index,'个')
+                console.log('移除第',index,'个');
             },
             // 搜索条件改变时
             conditionChange(selet,index){
@@ -386,7 +430,7 @@
                     if(this.searchGroup[index].type ==="dates"){
                         console.log('日期之间');
                         this.searchGroup[index].list = [{}];
-                         this.showDateRange =!this.showDateRange ; // 修改enelemt样式bug
+                         this.showDateRange =true ; // 修改enelemt样式bug
                     }
                 }else{
                     // 不是日期之间
@@ -394,7 +438,7 @@
                         console.log('日期不是之间');
                         // this.searchGroup[index].list = [{}];  //直接置空对象
                         delete this.searchGroup[index].list[0].dateRange; // 或 清空队形属性（好处时可以保留日期里的结果
-                         this.showDateRange =!this.showDateRange ;// 修改enelemt样式bug
+                         this.showDateRange =false ;// 修改enelemt样式bug
                     }
                 }
             },
@@ -460,12 +504,120 @@
                 // 3.初始化 车型  车款
                 this.searchGroup[index].list[ide].styleID = '';
             },
+            // 搜索重置
+            searchResetting(){
+                this.searchGroup.forEach((value,index)=>{
+                    switch (value.type) {
+                        case 'selectes':
+                            value.list = [{selected:''}];
+                            break;
+                        case 'carAbout':
+                            value.list = [{brandID:'',seriesID:'',modelID:'',styleID:''}];
+                            break;
+                        case 'address':
+                            value.list = {pro:'',city:'',area:'',address:''};
+                            break;
+                        default:
+                            value.list = [{}];
+                            break;
+                    }
+                })
+            }
         },
         mounted(){
             // 获取汽车品牌信息
             this.getBrandData();
             // 获取省份
             this.getProData();
+            //点击des_search关闭addCellSelect
+            this.$refs.dms_search.onclick = ()=>{
+                if(this.addCellshow === true){
+                     this.addCellshow = false;
+                }
+            }
         }
     }
 </script>
+<style lang='less'>
+.dms_search {
+    // border: 1px solid #bcf127;
+    padding: 20px 0;
+    width: 100%;
+    height: 100%;
+    background-color: #575757;
+    opacity: 0.9;
+    color: #fff;
+    overflow-y: auto;
+    .search_item{
+        margin: 10px 0;
+    }
+    .search_item:hover .searchTop button {
+        display: inline-block;
+        float: right;
+    }
+    .searchTop{
+        padding-right: 20px;
+        button {
+            float: right;
+            display: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            padding: 0;
+            text-align: center;
+        }
+        select {
+            background-color: #575757;
+            color: #fff;
+            border: none;
+            // height: 30px;
+            width: 80px;
+            option {
+                color: black;
+                background-color: #fff;
+            }
+        }
+    }
+    select,input{
+        border: 1px solid #ccc ;
+        border-radius: 4px;
+        height: 30px;
+        // width: 230px;
+    }
+    button {
+        position: relative;
+        overflow: hidden;
+        height: 32px;
+        border: none;
+        border-radius: 4px;
+        color: #fff;
+        background: #575757;
+        padding: 6px 15px;
+        line-height: 15px;
+        cursor: pointer;
+    }
+    .footer_btn {
+        background: #D3E8FD;
+        color: black;
+        width: 100px;
+    }
+    &::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+    &::-webkit-scrollbar-thumb {
+        /*滚动条里面小方块*/
+        border-radius: 5px;
+        -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        background: #c2c2c2;
+    }
+    &::-webkit-scrollbar-track {
+        /*滚动条里面轨道*/
+        -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        border-radius: 0;
+        background: rgba(0, 0, 0, 0.1);
+    }
+}
+
+</style>
+

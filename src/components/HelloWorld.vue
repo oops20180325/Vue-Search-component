@@ -1,5 +1,5 @@
 <template>
-  <div class="hello">
+  <div class="hello" style="height:600px;width:350px;padding-bottom:100px;">
     <!-- <mySearch :options='options' @search='upload'></mySearch> -->
     <dmsSearch/>
   </div>
@@ -15,7 +15,7 @@ export default {
       // search
       // options:[{value:'编号',type:0},{value:'关键词',type:1},{value:'型号',type:2},{value:'生产日期',type:3},{value:'销售日期',type:3}]
       // dms search
-      
+
 
 
     }
@@ -25,8 +25,8 @@ export default {
     dmsSearch
   },
   methods:{
-    // upload(e){ 
-    //   console.log( '父元素收到',e) 
+    // upload(e){
+    //   console.log( '父元素收到',e)
     // }
 
   }
